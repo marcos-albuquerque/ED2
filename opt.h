@@ -5,7 +5,35 @@ typedef struct user User;
 typedef struct treeNode TreeNode;
 typedef struct tree Tree;
 
-void main_opt(void);
+struct user {
+    char userName[11];
+    char password[7];
+    int bestScoreSum;
+    int bestScoreSub;
+    int bestScoreMul;
+    int bestScoreDiv;
+    int bestScoreMix;
+};
+
+struct treeNode {
+    User* info;
+    TreeNode* left;
+    TreeNode* right;
+};
+
+struct tree {
+    TreeNode* root;
+};
+
+Tree* tree_creates(void);
+void bst_insert(Tree* t, User* u);
+void SaveInFile(Tree* t);
+void readFromFile(Tree *t);
+void bst_imprime(Tree* t);
+void bst_remove(Tree* t, User* u);
 void main_menu(void);
+void main_opt(void);
+TreeNode* bst_search(Tree *t, char* name);
+void bst_release(Tree* t);
 
 #endif // OPT_H_INCLUDED

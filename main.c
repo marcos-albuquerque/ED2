@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "opt.h"
+#include "game.h"
 
 int main()
 {
@@ -12,7 +13,7 @@ int main()
     while(op != '3') {
         switch(op) {
             case '1':
-                printf("Jogar\n");
+                auth(); // autenticação de usuário para poder jogar
                 break;
             case '2':
                 main_opt();

@@ -3,29 +3,9 @@
 #include <string.h>
 #include "opt.h"
 
-struct user {
-    char userName[11];
-    char password[7];
-    int bestScoreSum;
-    int bestScoreSub;
-    int bestScoreMul;
-    int bestScoreDiv;
-    int bestScoreMix;
-};
-
-struct treeNode {
-    User* info;
-    TreeNode* left;
-    TreeNode* right;
-};
-
-struct tree {
-    TreeNode* root;
-};
-
 Tree* tree_creates(void)
 {
-    Tree* t = (Tree*) malloc(sizeof(Tree));
+    Tree* t = (Tree*) malloc(sizeof(struct tree));
 
     if(t == NULL) {
         printf("Não há memória disponível.\b");
@@ -37,7 +17,7 @@ Tree* tree_creates(void)
     return t;
 }
 
-static User* creates_user(char *name, char* password)
+static User* creates_user(char *name, char* password, int sum, int sub, int mul, int div, int mix)
 {
     User* u = (User*) malloc(sizeof(User));
 
@@ -49,12 +29,11 @@ static User* creates_user(char *name, char* password)
     strcpy(u->userName, name);
     strcpy(u->password, password);
 
-    // inicializa os scores
-    u->bestScoreSum = 0;
-    u->bestScoreSub = 0;
-    u->bestScoreMul = 0;
-    u->bestScoreDiv = 0;
-    u->bestScoreMix = 0;
+    u->bestScoreSum = sum;
+    u->bestScoreSub = sub;
+    u->bestScoreMul = mul;
+    u->bestScoreDiv = div;
+    u->bestScoreMix = mix;
 
     return u;
 }
@@ -69,7 +48,8 @@ static TreeNode* insert(TreeNode* r, User* u)
             exit(1);
         }
 
-        r->info = creates_user(u->userName, u->password);
+        r->info = creates_user(u->userName, u->password, u->bestScoreSum, u->bestScoreSub,
+                                    u->bestScoreMul, u->bestScoreDiv, u->bestScoreMix);
         r->left = r->right = NULL;
     }
     else if(strcmp(u->userName, r->info->userName) < 0)
@@ -96,7 +76,8 @@ static void Save(TreeNode* r, FILE* file)
   }
 }
 
-void SaveInFile(Tree* t) {
+void SaveInFile(Tree* t)
+{
   FILE* file = fopen("./user.b", "wb");
 
   if(file == NULL) {
@@ -108,7 +89,7 @@ void SaveInFile(Tree* t) {
   fclose(file);
 }
 
-static void readFromFile(Tree *t)
+void readFromFile(Tree *t)
 {
   FILE* file = fopen("./user.b", "rb");
   User u;
@@ -129,8 +110,11 @@ static void readFromFile(Tree *t)
 static void print_users(User* u)
 {
   printf("Nome: %s\t", u->userName);
-  printf("Senha: %s\t", u->password);
-  printf("ScoreMix: %d\n\n", u->bestScoreMix);
+  printf("Sum: %d\t", u->bestScoreSum);
+  printf("Sub: %d\t", u->bestScoreSub);
+  printf("Mul: %d\t", u->bestScoreMul);
+  printf("Div: %d\t", u->bestScoreDiv);
+  printf("Mix: %d\n\n", u->bestScoreMix);
 }
 
 static void print(TreeNode* r)
@@ -147,53 +131,6 @@ void bst_imprime(Tree* t)
   print(t->root);
 }
 
-void main_menu(void)
-{
-    printf("====== MENU ======\n"
-           "1 - Jogar\n"
-           "2 - Opções\n"
-           "3 - Sair\n"
-           "===================\n");
-}
-
-static void menu_opt(void)
-{
-    printf("======= Opções =======\n"
-           "1 - Cadastrar usuário\n"
-           "2 - Mostrar usuários\n"
-           "3 - Apagar usuário\n"
-           "4 - Voltar\n"
-           "======================\n");
-}
-
-static int readUser(User* u)
-{
-    char s1[11];
-    char s2[7];
-    printf("Degite um nome de no máximo 10 caracteres: ");
-    scanf("%s", s1);
-
-    if(strlen(s1) > 10) {
-      printf("\nO nome deve ter no máximo 10 caracteres.\n");
-      printf("Tente novamente.\n\n");
-      return -1;
-    }
-
-    strcpy(u->userName, s1);
-
-    printf("Digite uma senha de no máximo 6 caracteres: ");
-    scanf("%s", s2);
-
-    if(strlen(s2) > 6) {
-      printf("\nA senha deve ter no máximo 6 caracteres.\n");
-      printf("Tente novamente.\n\n");
-      return -1;
-    }
-    strcpy(u->password, s2);
-
-    return 1;
-}
-
 static TreeNode* Remove(TreeNode* r, User* u)
 {
     if(r == NULL)
@@ -203,7 +140,6 @@ static TreeNode* Remove(TreeNode* r, User* u)
     else if( strcmp(r->info->userName, u->userName) < 0 )
         r->right = Remove(r->right, u);
     else { // achou o elemento
-        printf("Passou aqui\n");
         // elemento sem filho
         if( r->left == NULL && r->right == NULL ) {
             free(r);
@@ -241,6 +177,88 @@ static TreeNode* Remove(TreeNode* r, User* u)
 void bst_remove(Tree* t, User* u)
 {
     t->root = Remove(t->root, u);
+}
+
+static TreeNode* search(TreeNode* r, char* name)
+{
+    if( r == NULL ) return NULL;
+    else if( strcmp(r->info->userName, name) > 0 ) return search(r->left, name);
+    else if( strcmp(r->info->userName, name) < 0 ) return search(r->right, name);
+    else return r;
+}
+
+TreeNode* bst_search(Tree *t, char* name)
+{
+    return search(t->root, name);
+}
+
+static int readUser(User* u)
+{
+    char s1[11];
+    char s2[7];
+    printf("Degite um nome de no máximo 10 caracteres: ");
+    scanf("%s", s1);
+
+    if(strlen(s1) > 10) {
+      printf("\nO nome deve ter no máximo 10 caracteres.\n");
+      printf("Tente novamente.\n\n");
+      return -1;
+    }
+
+    strcpy(u->userName, s1);
+
+    printf("Digite uma senha de no máximo 6 caracteres: ");
+    scanf("%s", s2);
+
+    if(strlen(s2) > 6) {
+      printf("\nA senha deve ter no máximo 6 caracteres.\n");
+      printf("Tente novamente.\n\n");
+      return -1;
+    }
+    strcpy(u->password, s2);
+
+    // inicializa os scores
+    u->bestScoreSum = 0;
+    u->bestScoreSub = 0;
+    u->bestScoreMul = 0;
+    u->bestScoreDiv = 0;
+    u->bestScoreMix = 0;
+
+    return 0;
+}
+
+static void release(TreeNode* r)
+{
+    if( r != NULL ) {
+        release(r->left);
+        release(r->right);
+        free(r);
+    }
+}
+
+void bst_release(Tree* t)
+{
+    release(t->root);
+    free(t);
+}
+
+void main_menu(void)
+{
+    printf("====== MENU ======\n"
+           "1 - Jogar\n"
+           "2 - Opções\n"
+           "3 - Sair\n"
+           "===================\n");
+}
+
+static void menu_opt(void)
+{
+    printf("======= Opções =======\n"
+           "1 - Cadastrar usuário\n"
+           "2 - Mostrar usuários\n"
+           "3 - Apagar usuário\n"
+           "4 - Voltar\n"
+           "======================\n");
 }
 
 void main_opt(void)
