@@ -5,7 +5,7 @@
 
 Tree* tree_creates(void)
 {
-    Tree* t = (Tree*) malloc(sizeof(struct tree));
+    Tree* t = (Tree*) malloc(sizeof(Tree));
 
     if(t == NULL) {
         printf("Não há memória disponível.\b");
@@ -131,6 +131,28 @@ void bst_imprime(Tree* t)
   print(t->root);
 }
 
+static int bestMix(TreeNode* r)
+{
+    if(r == NULL)
+        return -1;
+
+    int res = r->info->bestScoreMix;
+    int lres = bestMix(r->left);
+    int rres = bestMix(r->right);
+
+    if(lres > res)
+        res = lres;
+    if(rres > res)
+        res = rres;
+
+    return res;
+}
+
+int bst_bestMix(Tree* t)
+{
+    return bestMix(t->root);
+}
+
 static TreeNode* Remove(TreeNode* r, User* u)
 {
     if(r == NULL)
@@ -190,6 +212,26 @@ static TreeNode* search(TreeNode* r, char* name)
 TreeNode* bst_search(Tree *t, char* name)
 {
     return search(t->root, name);
+}
+
+static TreeNode* searchByValue(TreeNode* r, int v)
+{
+    if(r == NULL)
+        return NULL; // árvore vazia: não encontrou
+    else if(v == r->info->bestScoreMix)
+        return r;
+    else {
+        TreeNode* p = searchByValue(r->left, v); // busca na sae
+        if(p != NULL)
+            return p;
+        else
+            return searchByValue(r->right, v); // busca na sad
+    }
+}
+
+TreeNode* bst_searchByValue(Tree* t, int v)
+{
+    return searchByValue(t->root, v);
 }
 
 static int readUser(User* u)
@@ -285,9 +327,16 @@ void main_opt(void)
                 SaveInFile(t);
                 break;
             }
-            case '2':
+            case '2': {
+                int r = bst_bestMix(t);
+                TreeNode *res = bst_searchByValue(t, r);
+                printf("\n======== Melhor Pontuação Atual ========\n");
+                printf("\tMelhor pontuação atual:\n\t%s\t\tMix: %d\n", res->info->userName, res->info->bestScoreMix);
+                printf("========================================\n\n");
+
                 bst_imprime(t);
                 break;
+            }
             case '3': {
                 User u;
                 char name[11];

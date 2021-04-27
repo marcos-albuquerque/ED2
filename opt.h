@@ -34,6 +34,8 @@ void bst_remove(Tree* t, User* u);
 void main_menu(void);
 void main_opt(void);
 TreeNode* bst_search(Tree *t, char* name);
+TreeNode* bst_searchByValue(Tree* t, int v);
+int bst_bestMix(Tree* t);
 void bst_release(Tree* t);
 
 #endif // OPT_H_INCLUDED
