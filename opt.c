@@ -2,6 +2,29 @@
 #include <stdlib.h>
 #include <string.h>
 #include "opt.h"
+#include "game.h"
+
+struct user {
+    char userName[11];
+    char password[7];
+    int bestScoreSum;
+    int bestScoreSub;
+    int bestScoreMul;
+    int bestScoreDiv;
+    int bestScoreMix;
+};
+
+struct treeNode {
+    User* info;
+    TreeNode* left;
+    TreeNode* right;
+};
+
+struct tree {
+    TreeNode* root;
+};
+
+//enum operation{ SUM, SUB, MUL, DIV, MIX };
 
 Tree* tree_creates(void)
 {
@@ -282,6 +305,54 @@ void bst_release(Tree* t)
 {
     release(t->root);
     free(t);
+}
+
+void update(char *name, Operation op, int score )
+{
+    Tree *t = tree_creates();
+    readFromFile(t);
+
+    TreeNode* iPtr = bst_search(t, name);
+
+    switch(op) {
+        case SUM:
+            if(iPtr->info->bestScoreSum < score)
+                iPtr->info->bestScoreSum = score;
+            break;
+        case SUB:
+            if(iPtr->info->bestScoreSub < score)
+                iPtr->info->bestScoreSub = score;
+            break;
+        case MUL:
+            if(iPtr->info->bestScoreMul < score)
+                iPtr->info->bestScoreMul = score;
+            break;
+        case DIV:
+            if(iPtr->info->bestScoreDiv < score)
+                iPtr->info->bestScoreDiv = score;
+            break;
+        case MIX:
+            if(iPtr->info->bestScoreMix < score)
+                iPtr->info->bestScoreMix = score;
+            break;
+    }
+
+    SaveInFile(t);
+}
+
+void verify(char* name, char* password)
+{
+    Tree *t = tree_creates();
+    readFromFile(t);
+
+    // Realiza pesquisar para verificar se o usuário consta na lista
+    TreeNode* iPtr = bst_search(t, name);
+
+    // Caso o nome e senha conste na lista, é dado acesso ao jogo
+    if( iPtr != NULL && strcmp( iPtr->info->userName, name ) == 0 && strcmp( iPtr->info->password, password ) == 0 )
+        main_game(name);
+    else
+        printf("\nUsuário ou senha incorretos!\n\n");
 }
 
 void main_menu(void)

@@ -58,19 +58,9 @@ void sum(int level, char *name)
         else // tratamento para reposta errada
         {
             printf("Errou! A resposta correta era %d\n", ansCorrect);
-
             i = -1;
-
-            Tree *t = tree_creates();
-            readFromFile(t);
-
-            TreeNode *iPtr = bst_search(t, name);
-
-            if(iPtr->info->bestScoreSum < score)
-                iPtr->info->bestScoreSum = score;
+            update(name, SUM, score );
             printf("Sua pontuação nessa partida: %d\n", score);
-
-            SaveInFile(t);
         }
     }
 }
@@ -102,17 +92,8 @@ void subt(int level, char *name)
         {
             printf("Errou! A resposta correta era %d\n", ansCorrect);
             i = -1;
-
-            Tree *t = tree_creates();
-            readFromFile(t);
-
-            TreeNode *iPtr = bst_search(t, name);
-
-            if(iPtr->info->bestScoreSub < score)
-                iPtr->info->bestScoreSub = score;
+            update(name, SUB, score );
             printf("Sua pontuação nessa partida: %d\n", score);
-
-            SaveInFile(t);
         }
     }
 }
@@ -144,17 +125,8 @@ void mult(int level, char *name)
         {
             printf("Errou! A resposta correta era %d\n", ansCorrect);
             i = -1;
-
-            Tree *t = tree_creates();
-            readFromFile(t);
-
-            TreeNode *iPtr = bst_search(t, name);
-
-            if(iPtr->info->bestScoreMul < score)
-                iPtr->info->bestScoreMul = score;
+            update(name, MUL, score );
             printf("Sua pontuação nessa partida: %d\n", score);
-
-            SaveInFile(t);
         }
     }
 }
@@ -186,17 +158,8 @@ void divi(int level, char *name)
         {
             printf("Errou! A resposta correta era %d\n", ansCorrect);
             i = -1;
-
-            Tree *t = tree_creates();
-            readFromFile(t);
-
-            TreeNode *iPtr = bst_search(t, name);
-
-            if(iPtr->info->bestScoreDiv < score)
-                iPtr->info->bestScoreDiv = score;
+            update(name, DIV, score );
             printf("Sua pontuação nessa partida: %d\n", score);
-
-            SaveInFile(t);
         }
     }
 }
@@ -255,17 +218,9 @@ void mix(int level, char *name)
         {
             printf("Errou! A resposta correta era %d\n", ansCorrect);
             i = -1;
-
-            Tree *t = tree_creates();
-            readFromFile(t);
-
-            TreeNode *iPtr = bst_search(t, name);
-
-            if(iPtr->info->bestScoreMix < score)
-                iPtr->info->bestScoreMix = score;
+            update(name, MIX, score );
+            //update(name, 4, score);
             printf("Sua pontuação nessa partida: %d\n", score);
-
-            SaveInFile(t);
         }
     }
 }
@@ -372,9 +327,6 @@ int randDivi(int level, int *a, int *b)
 
 void auth()
 {
-    Tree *t = tree_creates();
-    readFromFile(t);
-
     char name[11];
     char password[7];
 
@@ -383,14 +335,7 @@ void auth()
     printf("Digite sua senha:\n> ");
     scanf("%s", password);
 
-    // Realiza pesquisar para verificar se o usuário consta na lista
-    TreeNode* iPtr = bst_search(t, name);
-
-    // Caso o nome e senha conste na lista, é dado acesso ao jogo
-    if( iPtr != NULL && strcmp( iPtr->info->userName, name ) == 0 && strcmp( iPtr->info->password, password ) == 0 )
-        main_game(name);
-    else
-        printf("\nUsuário ou senha incorretos!\n\n");
+    verify(name, password);
 }
 
 // função principal do game

@@ -4,26 +4,8 @@
 typedef struct user User;
 typedef struct treeNode TreeNode;
 typedef struct tree Tree;
-
-struct user {
-    char userName[11];
-    char password[7];
-    int bestScoreSum;
-    int bestScoreSub;
-    int bestScoreMul;
-    int bestScoreDiv;
-    int bestScoreMix;
-};
-
-struct treeNode {
-    User* info;
-    TreeNode* left;
-    TreeNode* right;
-};
-
-struct tree {
-    TreeNode* root;
-};
+typedef enum operation Operation;
+enum operation{ SUM, SUB, MUL, DIV, MIX };
 
 Tree* tree_creates(void);
 void bst_insert(Tree* t, User* u);
@@ -36,6 +18,8 @@ void main_opt(void);
 TreeNode* bst_search(Tree *t, char* name);
 TreeNode* bst_searchByValue(Tree* t, int v);
 int bst_bestMix(Tree* t);
+void update(char *name, Operation op, int score );
+void verify(char* name, char* password);
 void bst_release(Tree* t);
 
 #endif // OPT_H_INCLUDED
